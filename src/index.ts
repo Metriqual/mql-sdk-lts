@@ -6,6 +6,8 @@ import { SystemPromptsAPI } from './api/system-prompts';
 import { OrganizationsAPI } from './api/organizations';
 import { AnalyticsAPI } from './api/analytics';
 import { ModelsAPI } from './api/models';
+import { WebhooksAPI } from './api/webhooks';
+import { PricingAPI } from './api/pricing';
 import type { MQLClientOptions } from './types';
 
 /**
@@ -68,6 +70,12 @@ export class MQL {
   /** Models listing API */
   public readonly models: ModelsAPI;
 
+  /** Webhooks API */
+  public readonly webhooks: WebhooksAPI;
+
+  /** Pricing API */
+  public readonly pricing: PricingAPI;
+
   /**
    * Create a new MQL SDK client
    * 
@@ -89,6 +97,8 @@ export class MQL {
     this.organizations = new OrganizationsAPI(this.httpClient);
     this.analytics = new AnalyticsAPI(this.httpClient);
     this.models = new ModelsAPI(this.httpClient);
+    this.webhooks = new WebhooksAPI(this.httpClient);
+    this.pricing = new PricingAPI(this.httpClient);
   }
 
   /**
@@ -139,6 +149,8 @@ export {
   OrganizationsAPI,
   AnalyticsAPI,
   ModelsAPI,
+  WebhooksAPI,
+  PricingAPI,
 };
 
 // Default export

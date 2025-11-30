@@ -609,3 +609,23 @@ export interface ProxyResponseHeaders {
   /** Request ID for tracking */
   'x-mql-request-id'?: string;
 }
+
+// ============================================================================
+// Pricing Types
+// ============================================================================
+
+export interface ModelPricing {
+  model: string;
+  inputPricePerToken?: number;
+  outputPricePerToken?: number;
+  inputPricePer1M?: number;
+  outputPricePer1M?: number;
+  contextLength?: number;
+  supportsVision?: boolean;
+  supportsFunctionCalling?: boolean;
+}
+
+export interface ProviderPricingResponse {
+  provider: string;
+  models: ModelPricing[];
+}

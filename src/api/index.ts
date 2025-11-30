@@ -5,3 +5,5 @@ export { SystemPromptsAPI } from './system-prompts';
 export { OrganizationsAPI } from './organizations';
 export { AnalyticsAPI } from './analytics';
 export { ModelsAPI } from './models';
+export { WebhooksAPI } from './webhooks';
+export { PricingAPI } from './pricing';
