@@ -1,0 +1,67 @@
+{
+  "name": "@metriqual/sdk",
+  "version": "0.1.0",
+  "description": "Official TypeScript SDK for MQL - AI Proxy Gateway with smart routing, usage tracking, and content filtering",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "lint": "eslint src --ext .ts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "ai",
+    "llm",
+    "openai",
+    "anthropic",
+    "claude",
+    "gpt",
+    "proxy",
+    "gateway",
+    "api",
+    "sdk",
+    "typescript",
+    "metriqual",
+    "mql"
+  ],
+  "author": "Metriqual",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Metriqual/mql-sdk"
+  },
+  "homepage": "https://metriqual.io",
+  "bugs": {
+    "url": "https://github.com/Metriqual/mql-sdk/issues"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "tsup": "^8.0.1",
+    "typescript": "^5.3.0",
+    "vitest": "^1.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

@@ -1,0 +1,35 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Test coverage
+coverage/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Environment
+.env
+.env.*
+
+# Temporary files
+*.tmp
+*.temp
+
+# Package lock files (use package-lock.json or yarn.lock, not both)
+# Uncomment the one you don't use:
+# package-lock.json
+# yarn.lock
