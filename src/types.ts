@@ -108,6 +108,24 @@ export interface ProxyKeyUsageResponse {
   providers: ProviderStatus[];
   activeProvider: string | null;
   allExhausted: boolean;
+  filters?: Array<{
+    id: string;
+    name: string;
+    description?: string;
+    filterType: FilterType;
+    action: FilterAction;
+    applyTo: FilterApplyTo;
+    enabled: boolean;
+    config: Record<string, unknown>;
+  }>;
+  systemPrompts?: Array<{
+    id: string;
+    name: string;
+    description?: string;
+    content: string;
+    injectionMode: InjectionMode;
+    priority: number;
+  }>;
 }
 
 export interface ProxyKeyListResponse {

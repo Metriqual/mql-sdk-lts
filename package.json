@@ -1,6 +1,6 @@
 {
   "name": "@metriqual/sdk",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Official TypeScript SDK for MQL - AI Proxy Gateway with smart routing, usage tracking, and content filtering",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -51,7 +51,7 @@
     "type": "git",
     "url": "https://github.com/Metriqual/mql-sdk"
   },
-  "homepage": "https://metriqual.io",
+  "homepage": "https://metriqual.com",
   "bugs": {
     "url": "https://github.com/Metriqual/mql-sdk/issues"
   },

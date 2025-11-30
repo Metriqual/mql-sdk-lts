@@ -236,6 +236,24 @@ export class ProxyKeysAPI {
       }>;
       active_provider: string | null;
       all_exhausted: boolean;
+      filters?: Array<{
+        id: string;
+        name: string;
+        description?: string;
+        filter_type: string;
+        action: string;
+        apply_to: string;
+        enabled: boolean;
+        config: Record<string, unknown>;
+      }>;
+      system_prompts?: Array<{
+        id: string;
+        name: string;
+        description?: string;
+        content: string;
+        injection_mode: string;
+        priority: number;
+      }>;
     };
 
     return {
@@ -251,6 +269,24 @@ export class ProxyKeysAPI {
       })),
       activeProvider: data.active_provider,
       allExhausted: data.all_exhausted,
+      filters: data.filters?.map(f => ({
+        id: f.id,
+        name: f.name,
+        description: f.description,
+        filterType: f.filter_type as any,
+        action: f.action as any,
+        applyTo: f.apply_to as any,
+        enabled: f.enabled,
+        config: f.config,
+      })),
+      systemPrompts: data.system_prompts?.map(p => ({
+        id: p.id,
+        name: p.name,
+        description: p.description,
+        content: p.content,
+        injectionMode: p.injection_mode as any,
+        priority: p.priority,
+      })),
     };
   }
 

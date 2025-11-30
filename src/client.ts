@@ -33,7 +33,7 @@ export class HttpClient {
   private readonly fetchFn: typeof fetch;
 
   constructor(options: MQLClientOptions = {}) {
-    this.baseUrl = (options.baseUrl || 'https://api.metriqual.io').replace(/\/$/, '');
+    this.baseUrl = (options.baseUrl || 'https://api.metriqual.com').replace(/\/$/, '');
     this.apiKey = options.apiKey;
     this.token = options.token;
     this.timeout = options.timeout || 30000;

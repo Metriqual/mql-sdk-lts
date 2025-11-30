@@ -82,7 +82,7 @@ For management operations (proxy keys, filters, organizations), you'll need a Su
 ```typescript
 const mql = new MQL({ 
   token: 'your-supabase-jwt',
-  baseUrl: 'https://api.metriqual.io' // or your self-hosted URL
+  baseUrl: 'https://api.metriqual.com' // or your self-hosted URL
 });
 ```
 
@@ -245,7 +245,7 @@ try {
 
 ```typescript
 const mql = new MQL({
-  // Base URL (default: https://api.metriqual.io)
+  // Base URL (default: https://api.metriqual.com)
   baseUrl: 'http://localhost:8080',
   
   // Proxy key for chat completions
@@ -325,6 +325,6 @@ MIT
 
 ## Links
 
-- [Documentation](https://docs.metriqual.io)
+- [Documentation](https://docs.metriqual.com)
 - [GitHub](https://github.com/Metriqual/mql-sdk)
 - [MQL Backend](https://github.com/Metriqual/mql)

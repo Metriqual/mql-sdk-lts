@@ -80,7 +80,7 @@ export class MQL {
    * Create a new MQL SDK client
    * 
    * @param options - Client configuration options
-   * @param options.baseUrl - Base URL of the MQL API (default: https://api.metriqual.io)
+   * @param options.baseUrl - Base URL of the MQL API (default: https://api.metriqual.com)
    * @param options.apiKey - Proxy key for chat completions (starts with 'mql-')
    * @param options.token - Supabase JWT for management operations
    * @param options.timeout - Request timeout in ms (default: 30000)
