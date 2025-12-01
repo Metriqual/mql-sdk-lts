@@ -553,18 +553,33 @@ export type WebhookEvent =
 
 export interface Webhook {
   id: string;
+  userId?: string;
+  orgId?: string;
   url: string;
   events: WebhookEvent[];
-  secret: string | null;
+  secret?: string;
   enabled: boolean;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface WebhookDelivery {
+  id: string;
+  webhookId: string;
+  eventType: WebhookEvent;
+  payload: Record<string, unknown>;
+  statusCode?: number;
+  responseBody?: string;
+  errorMessage?: string;
+  success: boolean;
+  attemptedAt: string;
 }
 
 export interface CreateWebhookRequest {
   url: string;
   events: WebhookEvent[];
   secret?: string;
+  orgId?: string;
 }
 
 export interface UpdateWebhookRequest {
