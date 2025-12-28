@@ -1,0 +1,98 @@
+name: Production Tests
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Test environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+
+jobs:
+  production-integration-tests:
+    name: Integration Tests (${{ github.event.inputs.environment }})
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate environment selection
+        run: |
+          if [ "${{ github.event.inputs.environment }}" = "production" ]; then
+            if [ -z "${{ secrets.MQL_PRODUCTION_API_KEY }}" ]; then
+              echo "❌ Production API key not configured"
+              exit 1
+            fi
+          fi
+
+      - name: Run integration tests
+        run: npm test -- src/__tests__/integration.*.test.ts
+        env:
+          MQL_BASE_URL: ${{ github.event.inputs.environment == 'production' && 'https://api.metriqual.com' || 'https://staging.api.metriqual.com' }}
+          MQL_API_KEY: ${{ github.event.inputs.environment == 'production' && secrets.MQL_PRODUCTION_API_KEY || secrets.MQL_STAGING_API_KEY }}
+          MQL_TOKEN: ${{ github.event.inputs.environment == 'production' && secrets.MQL_PRODUCTION_TOKEN || secrets.MQL_STAGING_TOKEN }}
+          MQL_TEST_ENV: ${{ github.event.inputs.environment }}
+
+  production-e2e-tests:
+    name: E2E Tests (${{ github.event.inputs.environment }})
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run E2E tests
+        run: npm test -- src/__tests__/e2e.*.test.ts
+        env:
+          MQL_BASE_URL: ${{ github.event.inputs.environment == 'production' && 'https://api.metriqual.com' || 'https://staging.api.metriqual.com' }}
+          MQL_API_KEY: ${{ github.event.inputs.environment == 'production' && secrets.MQL_PRODUCTION_API_KEY || secrets.MQL_STAGING_API_KEY }}
+          MQL_TOKEN: ${{ github.event.inputs.environment == 'production' && secrets.MQL_PRODUCTION_TOKEN || secrets.MQL_STAGING_TOKEN }}
+          MQL_ORG_ID: ${{ github.event.inputs.environment == 'production' && secrets.MQL_PRODUCTION_ORG_ID || secrets.MQL_STAGING_ORG_ID }}
+          MQL_TEST_ENV: ${{ github.event.inputs.environment }}
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: prod-test-results-${{ github.event.inputs.environment }}
+          path: |
+            coverage/
+            vitest-results/
+
+  notify:
+    name: Send Notification
+    runs-on: ubuntu-latest
+    needs: [production-integration-tests, production-e2e-tests]
+    if: always()
+
+    steps:
+      - name: Report results
+        run: |
+          echo "Tests completed for ${{ github.event.inputs.environment }}"
+          if [ "${{ needs.production-integration-tests.result }}" = "failure" ] || [ "${{ needs.production-e2e-tests.result }}" = "failure" ]; then
+            echo "⚠️  Some tests failed"
+            exit 1
+          else
+            echo "✅ All tests passed!"
+          fi
