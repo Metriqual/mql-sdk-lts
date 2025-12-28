@@ -1,6 +1,6 @@
 {
   "name": "@metriqual/sdk",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Official TypeScript SDK for MQL - AI Proxy Gateway with smart routing, usage tracking, and content filtering",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -28,6 +28,13 @@
     "lint": "eslint src --ext .ts",
     "typecheck": "tsc --noEmit",
     "test": "vitest",
+    "test:unit": "vitest src/**/*.unit.test.ts",
+    "test:unit:watch": "vitest src/**/*.unit.test.ts --watch",
+    "test:unit:coverage": "vitest src/**/*.unit.test.ts --coverage",
+    "test:integration": "vitest src/__tests__/integration.*.test.ts",
+    "test:e2e": "vitest src/__tests__/e2e.*.test.ts",
+    "test:all": "vitest",
+    "test:ci": "vitest --run --reporter=verbose",
     "prepublishOnly": "npm run build"
   },
   "keywords": [
