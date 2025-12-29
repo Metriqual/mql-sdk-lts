@@ -279,6 +279,34 @@ const chatClient = new MQL({ apiKey: proxyKey });
 const response = await chatClient.chat.create({ messages: [...] });
 ```
 
+## Testing
+
+The SDK includes comprehensive unit, integration, and E2E tests. See [TESTING.md](./TESTING.md) for detailed testing documentation.
+
+### Quick Test Commands
+
+```bash
+# Run unit tests (no credentials needed)
+npm run test:unit
+
+# Run integration tests (requires MQL_API_KEY)
+npm run test:integration
+
+# Run E2E tests (requires MQL_API_KEY and MQL_TOKEN)
+npm run test:e2e
+
+# Run all tests with coverage
+npm run test:unit:coverage
+```
+
+### Test Coverage
+
+- **Unit Tests**: 40+ tests covering all SDK modules with mocked API responses
+- **Integration Tests**: Real API calls against staging environment
+- **E2E Tests**: Complete workflow scenarios combining multiple features
+
+For more information, see [TESTING.md](./TESTING.md).
+
 ## TypeScript Support
 
 The SDK is written in TypeScript and provides full type definitions:

@@ -163,31 +163,39 @@ export class ChatAPI {
 
   /**
    * Transform response from API format to SDK format
+   * Supports both OpenAI format (with choices array) and MQL local format (with message directly)
    */
   private transformResponse(response: Record<string, unknown>): ChatCompletionResponse {
-    const resp = response as {
-      id: string;
-      object: 'chat.completion';
-      created: number;
-      model: string;
-      choices: Array<{
-        index: number;
-        message: ChatMessage;
-        finish_reason: string | null;
-      }>;
-      usage: {
-        prompt_tokens: number;
-        completion_tokens: number;
-        total_tokens: number;
-      };
-    };
+    const resp = response as any;
 
+    // Handle local API format (message + metadata)
+    if (resp.message && !resp.choices && resp.metadata) {
+      const metadata = resp.metadata as any;
+      return {
+        id: resp.id || '',
+        object: 'chat.completion',
+        created: metadata.created || Date.now(),
+        model: resp.model || '',
+        choices: [{
+          index: 0,
+          message: resp.message,
+          finishReason: (metadata.finish_reason || 'stop') as ChatCompletionResponse['choices'][0]['finishReason'],
+        }],
+        usage: {
+          promptTokens: metadata.prompt_tokens || 0,
+          completionTokens: metadata.completion_tokens || 0,
+          totalTokens: metadata.tokens_used || (metadata.prompt_tokens || 0) + (metadata.completion_tokens || 0),
+        },
+      };
+    }
+
+    // Handle standard OpenAI format (with choices array)
     return {
       id: resp.id,
       object: resp.object,
       created: resp.created,
       model: resp.model,
-      choices: resp.choices.map(choice => ({
+      choices: resp.choices.map((choice: any) => ({
         index: choice.index,
         message: choice.message,
         finishReason: choice.finish_reason as ChatCompletionResponse['choices'][0]['finishReason'],
