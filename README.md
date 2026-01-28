@@ -10,10 +10,12 @@ Official TypeScript/JavaScript SDK for **MQL** - The AI Proxy Gateway with smart
 - 🔄 **OpenAI-Compatible API** - Drop-in replacement for OpenAI SDK
 - 🌊 **Streaming Support** - Real-time streaming with async iterators
 - 🔀 **Automatic Fallback** - Seamless provider switching when limits are reached
+- 🧪 **A/B Testing** - Run experiments to compare model performance
+- 💬 **Feedback Collection** - Gather user ratings and improve responses
 - 🛡️ **Content Filtering** - PII protection, profanity filtering, custom rules
 - 📊 **Usage Analytics** - Track costs, tokens, and latency
 - 🏢 **Multi-tenancy** - Organization support with role-based access
-- 💬 **System Prompts** - Behavioral control through prompt injection
+- 🎯 **System Prompts** - Behavioral control through prompt injection
 
 ## Installation
 
@@ -75,12 +77,97 @@ const reply = await mql.chat.complete([
 console.log(reply); // "4"
 ```
 
+## A/B Testing (Experiments)
+
+Run experiments to compare different models, configurations, or prompts:
+
+```typescript
+const mql = new MQL({ token: 'your-supabase-jwt' });
+
+// Create an experiment
+const experiment = await mql.experiments.create({
+  name: "GPT-4 vs Claude Comparison",
+  description: "Compare response quality and latency",
+  traffic_percentage: 0.5 // Route 50% of traffic
+});
+
+// Add variants to test
+await mql.experiments.createVariant(experiment.id, {
+  name: "GPT-4 Variant",
+  weight: 0.5,
+  config: { model: "gpt-4o", temperature: 0.7 }
+});
+
+await mql.experiments.createVariant(experiment.id, {
+  name: "Claude Variant",
+  weight: 0.5,
+  config: { model: "claude-3-5-sonnet-20241022", temperature: 0.7 }
+});
+
+// Start the experiment
+await mql.experiments.start(experiment.id);
+
+// Get analytics to see which variant performs better
+const analytics = await mql.experiments.getAnalytics(experiment.id);
+analytics.variants.forEach(v => {
+  console.log(`${v.variant_name}: ${v.summary.request_count} requests, ${v.summary.avg_latency_ms}ms avg`);
+});
+
+// Complete when done
+await mql.experiments.complete(experiment.id);
+```
+
+## Feedback Collection
+
+Collect user feedback to improve your LLM responses:
+
+```typescript
+const mql = new MQL({ token: 'your-supabase-jwt' });
+
+// Submit feedback for a request
+await mql.feedback.submit({
+  request_id: "req_123", // From chat completion response
+  rating: 5,
+  thumbs_up: true,
+  comment: "Very helpful and accurate!",
+  tags: ["accurate", "concise", "helpful"]
+});
+
+// Get feedback analytics
+const feedbackAnalytics = await mql.feedback.getAnalytics({
+  start_date: '2025-01-01',
+  end_date: '2025-01-31'
+});
+
+console.log(`Average rating: ${feedbackAnalytics.avg_rating}`);
+console.log(`Thumbs up: ${feedbackAnalytics.thumbs_up_percentage}%`);
+console.log(`Total feedback: ${feedbackAnalytics.total_feedback}`);
+
+// View feedback by model
+feedbackAnalytics.by_model.forEach(m => {
+  console.log(`${m.model}: ${m.avg_rating}/5 rating, ${m.thumbs_up_percentage}% thumbs up`);
+});
+
+// Export feedback data for analysis
+const jsonlData = await mql.feedback.export({
+  format: 'jsonl',
+  start_date: '2025-01-01',
+  limit: 1000
+});
+
+// Or export as CSV
+const csvData = await mql.feedback.export({
+  format: 'csv',
+  tags: ['production']
+});
+```
+
 ## Management APIs
 
 For management operations (proxy keys, filters, organizations), you'll need a Supabase JWT token:
 
 ```typescript
-const mql = new MQL({ 
+const mql = new MQL({
   token: 'your-supabase-jwt',
   baseUrl: 'https://api.metriqual.com' // or your self-hosted URL
 });
@@ -284,7 +371,7 @@ const response = await chatClient.chat.create({ messages: [...] });
 The SDK is written in TypeScript and provides full type definitions:
 
 ```typescript
-import { 
+import {
   MQL,
   ChatCompletionRequest,
   ChatCompletionResponse,
@@ -292,6 +379,11 @@ import {
   Filter,
   SystemPrompt,
   Organization,
+  Experiment,
+  ExperimentVariant,
+  ExperimentAnalytics,
+  Feedback,
+  FeedbackAnalytics,
 } from '@metriqual/sdk';
 ```
 

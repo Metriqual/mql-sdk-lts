@@ -8,6 +8,9 @@ import { AnalyticsAPI } from './api/analytics';
 import { ModelsAPI } from './api/models';
 import { WebhooksAPI } from './api/webhooks';
 import { PricingAPI } from './api/pricing';
+import { ExperimentsAPI } from './api/experiments';
+import { FeedbackAPI } from './api/feedback';
+import { PromptHubAPI } from './api/prompt-hub';
 import type { MQLClientOptions } from './types';
 
 /**
@@ -76,6 +79,15 @@ export class MQL {
   /** Pricing API */
   public readonly pricing: PricingAPI;
 
+  /** Experiments API (A/B Testing) */
+  public readonly experiments: ExperimentsAPI;
+
+  /** Feedback API */
+  public readonly feedback: FeedbackAPI;
+
+  /** Prompt Hub API */
+  public readonly promptHub: PromptHubAPI;
+
   /**
    * Create a new MQL SDK client
    * 
@@ -99,6 +111,9 @@ export class MQL {
     this.models = new ModelsAPI(this.httpClient);
     this.webhooks = new WebhooksAPI(this.httpClient);
     this.pricing = new PricingAPI(this.httpClient);
+    this.experiments = new ExperimentsAPI(this.httpClient);
+    this.feedback = new FeedbackAPI(this.httpClient);
+    this.promptHub = new PromptHubAPI(this.httpClient);
   }
 
   /**
@@ -151,6 +166,9 @@ export {
   ModelsAPI,
   WebhooksAPI,
   PricingAPI,
+  ExperimentsAPI,
+  FeedbackAPI,
+  PromptHubAPI,
 };
 
 // Default export

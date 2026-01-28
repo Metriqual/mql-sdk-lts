@@ -7,3 +7,6 @@ export { AnalyticsAPI } from './analytics';
 export { ModelsAPI } from './models';
 export { WebhooksAPI } from './webhooks';
 export { PricingAPI } from './pricing';
+export { ExperimentsAPI } from './experiments';
+export { FeedbackAPI } from './feedback';
+export { PromptHubAPI } from './prompt-hub';
