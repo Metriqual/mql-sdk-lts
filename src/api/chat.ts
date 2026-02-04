@@ -163,8 +163,47 @@ export class ChatAPI {
 
   /**
    * Transform response from API format to SDK format
+   * Handles both OpenAI standard format and MQL custom format
    */
   private transformResponse(response: Record<string, unknown>): ChatCompletionResponse {
+    // Check if this is MQL format (has 'message' field instead of 'choices')
+    if ('message' in response && 'metadata' in response) {
+      // MQL custom format
+      const resp = response as {
+        id: string;
+        object: 'chat.completion';
+        model: string;
+        message: ChatMessage;
+        metadata: {
+          provider_id?: string;
+          tokens_used?: number;
+          completion_tokens?: number;
+          prompt_tokens?: number;
+          created?: number;
+          finish_reason?: string;
+        };
+        provider: string;
+      };
+
+      return {
+        id: resp.id,
+        object: resp.object,
+        created: resp.metadata.created || Date.now(),
+        model: resp.model,
+        choices: [{
+          index: 0,
+          message: resp.message,
+          finishReason: (resp.metadata.finish_reason || 'stop') as ChatCompletionResponse['choices'][0]['finishReason'],
+        }],
+        usage: {
+          promptTokens: resp.metadata.prompt_tokens || 0,
+          completionTokens: resp.metadata.completion_tokens || 0,
+          totalTokens: resp.metadata.tokens_used || 0,
+        },
+      };
+    }
+
+    // OpenAI standard format
     const resp = response as {
       id: string;
       object: 'chat.completion';
