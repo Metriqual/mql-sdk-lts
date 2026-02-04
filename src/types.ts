@@ -662,3 +662,100 @@ export interface ProviderPricingResponse {
   provider: string;
   models: ModelPricing[];
 }
+
+// ============================================================================
+// Subscription & Plan Types (B2B Model)
+// ============================================================================
+
+export type PlanTier = 'Free' | 'Enterprise';
+
+export interface PlanLimits {
+  /** Maximum proxy keys (-1 = unlimited) */
+  maxProxyKeys: number;
+  /** Maximum providers per key (-1 = unlimited) */
+  maxProvidersPerKey: number;
+  /** Maximum team members (-1 = unlimited) */
+  maxTeamMembers: number;
+  /** Maximum filters (-1 = unlimited) */
+  maxFilters: number;
+  /** Maximum system prompts (-1 = unlimited) */
+  maxSystemPrompts: number;
+  /** Maximum monthly requests (-1 = unlimited) */
+  maxMonthlyRequests: number;
+}
+
+export interface PlanFeatures {
+  teams: boolean;
+  filters: boolean;
+  prompts: boolean;
+  webhooks: boolean;
+  analytics: boolean;
+  fallbackProviders: boolean;
+  customIntegrations: boolean;
+  sso: boolean;
+  dedicatedSupport: boolean;
+  onPremise: boolean;
+}
+
+export interface TrialStatus {
+  /** Whether trial is currently active */
+  isActive: boolean;
+  /** Days remaining in trial */
+  daysRemaining: number;
+  /** When trial started */
+  startedAt: string | null;
+  /** When trial ends */
+  endsAt: string | null;
+  /** Whether trial has already been used */
+  hasUsedTrial: boolean;
+}
+
+export interface SubscriptionStatus {
+  /** Current plan tier */
+  tier: PlanTier;
+  /** Plan limits for this tier */
+  limits: PlanLimits;
+  /** Features enabled for this tier */
+  features: PlanFeatures;
+  /** Trial information */
+  trial: TrialStatus;
+  /** Current usage counts */
+  usage: {
+    proxyKeys: number;
+    teamMembers: number;
+    filters: number;
+    systemPrompts: number;
+    monthlyRequests: number;
+  };
+}
+
+export interface StartTrialRequest {
+  /** Company name (required) */
+  companyName: string;
+  /** Company size */
+  companySize: '1-10' | '11-50' | '51-200' | '201-1000' | '1000+';
+  /** Industry (optional) */
+  industry?: string;
+  /** Phone number (required for consumer email domains) */
+  phoneNumber?: string;
+}
+
+export interface StartTrialResponse {
+  /** Whether trial was started successfully */
+  success: boolean;
+  /** Trial status after starting */
+  trial: TrialStatus;
+  /** Message to display */
+  message: string;
+}
+
+export interface UsageCapError {
+  error: string;
+  capType: 'proxy_keys' | 'providers' | 'filters' | 'system_prompts' | 'requests' | 'teams';
+  current: number;
+  limit: number;
+  trialAvailable: boolean;
+  trialCtaText?: string;
+  salesCtaText?: string;
+  currentPlan: string;
+}

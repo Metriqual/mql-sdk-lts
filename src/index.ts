@@ -11,6 +11,7 @@ import { PricingAPI } from './api/pricing';
 import { ExperimentsAPI } from './api/experiments';
 import { FeedbackAPI } from './api/feedback';
 import { PromptHubAPI } from './api/prompt-hub';
+import { SubscriptionAPI } from './api/subscription';
 import type { MQLClientOptions } from './types';
 
 /**
@@ -88,6 +89,9 @@ export class MQL {
   /** Prompt Hub API */
   public readonly promptHub: PromptHubAPI;
 
+  /** Subscription & Plan API (B2B Model: Free + Enterprise) */
+  public readonly subscription: SubscriptionAPI;
+
   /**
    * Create a new MQL SDK client
    * 
@@ -114,6 +118,7 @@ export class MQL {
     this.experiments = new ExperimentsAPI(this.httpClient);
     this.feedback = new FeedbackAPI(this.httpClient);
     this.promptHub = new PromptHubAPI(this.httpClient);
+    this.subscription = new SubscriptionAPI(this.httpClient);
   }
 
   /**
@@ -169,6 +174,7 @@ export {
   ExperimentsAPI,
   FeedbackAPI,
   PromptHubAPI,
+  SubscriptionAPI,
 };
 
 // Default export
