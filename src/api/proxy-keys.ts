@@ -158,7 +158,7 @@ export class ProxyKeysAPI {
         usage_limit: p.usageLimit,
       })),
       filter_ids: request.filterIds,
-      system_prompt_ids: request.systemPromptIds,
+      system_prompt_ids: request.promptIds,
     };
   }
 
@@ -279,7 +279,7 @@ export class ProxyKeysAPI {
         enabled: f.enabled,
         config: f.config,
       })),
-      systemPrompts: data.system_prompts?.map(p => ({
+      prompts: data.system_prompts?.map(p => ({
         id: p.id,
         name: p.name,
         description: p.description,

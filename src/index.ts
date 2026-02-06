@@ -2,7 +2,6 @@ import { HttpClient, MQLAPIError } from './client';
 import { ChatAPI } from './api/chat';
 import { ProxyKeysAPI } from './api/proxy-keys';
 import { FiltersAPI } from './api/filters';
-import { SystemPromptsAPI } from './api/system-prompts';
 import { OrganizationsAPI } from './api/organizations';
 import { AnalyticsAPI } from './api/analytics';
 import { ModelsAPI } from './api/models';
@@ -19,7 +18,7 @@ import type { MQLClientOptions } from './types';
  * 
  * The main entry point for interacting with the MQL AI Proxy Gateway.
  * Provides access to chat completions, proxy key management, content filtering,
- * system prompts, organizations, and analytics.
+ * PromptHub, organizations, and analytics.
  * 
  * @example Basic usage with a proxy key
  * ```typescript
@@ -61,9 +60,6 @@ export class MQL {
   
   /** Content filters API */
   public readonly filters: FiltersAPI;
-  
-  /** System prompts API */
-  public readonly systemPrompts: SystemPromptsAPI;
   
   /** Organizations API */
   public readonly organizations: OrganizationsAPI;
@@ -109,7 +105,6 @@ export class MQL {
     this.chat = new ChatAPI(this.httpClient);
     this.proxyKeys = new ProxyKeysAPI(this.httpClient);
     this.filters = new FiltersAPI(this.httpClient);
-    this.systemPrompts = new SystemPromptsAPI(this.httpClient);
     this.organizations = new OrganizationsAPI(this.httpClient);
     this.analytics = new AnalyticsAPI(this.httpClient);
     this.models = new ModelsAPI(this.httpClient);
@@ -165,7 +160,6 @@ export {
   ChatAPI,
   ProxyKeysAPI,
   FiltersAPI,
-  SystemPromptsAPI,
   OrganizationsAPI,
   AnalyticsAPI,
   ModelsAPI,

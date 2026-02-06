@@ -190,7 +190,7 @@ export class SubscriptionAPI {
    * ```
    */
   async isAtLimit(
-    resource: 'proxyKeys' | 'teamMembers' | 'filters' | 'systemPrompts' | 'monthlyRequests',
+    resource: 'proxyKeys' | 'teamMembers' | 'filters' | 'prompts' | 'monthlyRequests',
     orgId?: string
   ): Promise<boolean> {
     const status = await this.getStatus(orgId);
@@ -198,7 +198,7 @@ export class SubscriptionAPI {
       proxyKeys: 'maxProxyKeys',
       teamMembers: 'maxTeamMembers',
       filters: 'maxFilters',
-      systemPrompts: 'maxSystemPrompts',
+      prompts: 'maxPrompts',
       monthlyRequests: 'maxMonthlyRequests',
     };
 
@@ -221,7 +221,7 @@ export class SubscriptionAPI {
    * ```
    */
   async getRemainingQuota(
-    resource: 'proxyKeys' | 'teamMembers' | 'filters' | 'systemPrompts' | 'monthlyRequests',
+    resource: 'proxyKeys' | 'teamMembers' | 'filters' | 'prompts' | 'monthlyRequests',
     orgId?: string
   ): Promise<number | 'unlimited'> {
     const status = await this.getStatus(orgId);
@@ -229,7 +229,7 @@ export class SubscriptionAPI {
       proxyKeys: 'maxProxyKeys',
       teamMembers: 'maxTeamMembers',
       filters: 'maxFilters',
-      systemPrompts: 'maxSystemPrompts',
+      prompts: 'maxPrompts',
       monthlyRequests: 'maxMonthlyRequests',
     };
 

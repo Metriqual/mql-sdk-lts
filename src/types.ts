@@ -93,8 +93,8 @@ export interface CreateProxyKeyRequest {
   providers: ProviderConfig[];
   /** Optional list of filter IDs to apply to this proxy key */
   filterIds?: string[];
-  /** Optional list of system prompt IDs to inject into requests */
-  systemPromptIds?: string[];
+  /** Optional list of PromptHub prompt IDs to inject into requests */
+  promptIds?: string[];
 }
 
 export interface CreateProxyKeyResponse {
@@ -118,7 +118,7 @@ export interface ProxyKeyUsageResponse {
     enabled: boolean;
     config: Record<string, unknown>;
   }>;
-  systemPrompts?: Array<{
+  prompts?: Array<{
     id: string;
     name: string;
     description?: string;
@@ -348,61 +348,10 @@ export interface FilterListResponse {
 }
 
 // ============================================================================
-// System Prompt Types
+// Prompt Types (PromptHub)
 // ============================================================================
 
 export type InjectionMode = 'prepend' | 'append' | 'replace';
-
-export interface SystemPrompt {
-  id: string;
-  name: string;
-  description: string | null;
-  content: string;
-  injectionMode: InjectionMode;
-  priority: number;
-  isTemplate: boolean;
-  userId: string | null;
-  orgId: string | null;
-  proxyKeyId: string | null;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface CreateSystemPromptRequest {
-  name: string;
-  description?: string;
-  content: string;
-  injectionMode?: InjectionMode;
-  priority?: number;
-}
-
-export interface UpdateSystemPromptRequest {
-  name?: string;
-  description?: string;
-  content?: string;
-  injectionMode?: InjectionMode;
-  priority?: number;
-}
-
-export interface SystemPromptTemplate {
-  id: string;
-  name: string;
-  description: string;
-  content: string;
-  category: string;
-  injectionMode: InjectionMode;
-  useCases: string[];
-}
-
-export interface SystemPromptListResponse {
-  prompts: SystemPrompt[];
-  total: number;
-}
-
-export interface SystemPromptTemplatesResponse {
-  templates: SystemPromptTemplate[];
-  categories: string[];
-}
 
 // ============================================================================
 // Organization Types
@@ -678,8 +627,8 @@ export interface PlanLimits {
   maxTeamMembers: number;
   /** Maximum filters (-1 = unlimited) */
   maxFilters: number;
-  /** Maximum system prompts (-1 = unlimited) */
-  maxSystemPrompts: number;
+  /** Maximum prompts (-1 = unlimited) */
+  maxPrompts: number;
   /** Maximum monthly requests (-1 = unlimited) */
   maxMonthlyRequests: number;
 }
@@ -724,7 +673,7 @@ export interface SubscriptionStatus {
     proxyKeys: number;
     teamMembers: number;
     filters: number;
-    systemPrompts: number;
+    prompts: number;
     monthlyRequests: number;
   };
 }
@@ -751,7 +700,7 @@ export interface StartTrialResponse {
 
 export interface UsageCapError {
   error: string;
-  capType: 'proxy_keys' | 'providers' | 'filters' | 'system_prompts' | 'requests' | 'teams';
+  capType: 'proxy_keys' | 'providers' | 'filters' | 'prompts' | 'requests' | 'teams';
   current: number;
   limit: number;
   trialAvailable: boolean;
