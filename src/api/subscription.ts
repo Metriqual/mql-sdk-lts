@@ -14,7 +14,7 @@ import type {
  * Manage subscription status, trial, and plan information
  *
  * B2B Model:
- * - Free tier: 3 proxy keys, 2 providers/key, 1 filter, 1 prompt, 100K requests/month
+ * - Free tier: 1 proxy key, 1 fallback provider, 1 filter, 1 prompt, 100 requests/month
  * - Enterprise tier: Unlimited everything + teams, webhooks, SSO, dedicated support
  * - 14-day trial: Full Enterprise access, no credit card required
  */
