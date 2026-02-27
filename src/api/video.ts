@@ -84,6 +84,39 @@ export interface VideoDownloadResponse {
   expires_in_seconds: number;
 }
 
+// MiniMax Image-to-Video Types
+export interface MinimaxI2VRequest {
+  /** Model: "MiniMax-Hailuo-2.3" | "MiniMax-Hailuo-2.3-Fast" | "MiniMax-Hailuo-02" */
+  model?: string;
+  /** Public URL or Base64 Data URL of the first frame (JPG/PNG/WebP, <20MB) */
+  first_frame_image: string;
+  /** Optional video description (max 2000 chars) */
+  prompt?: string;
+  /** Video duration in seconds (6 or 10) */
+  duration?: 6 | 10;
+  /** Output resolution: "512P" | "720P" | "768P" | "1080P" */
+  resolution?: '512P' | '720P' | '768P' | '1080P';
+  /** Auto-optimize the prompt before generation. Defaults to true. */
+  prompt_optimizer?: boolean;
+  /** Fast pretreatment mode (Hailuo-2.3/02 only) */
+  fast_pretreatment?: boolean;
+}
+
+export interface MinimaxI2VResponse {
+  /** "video.minimax.i2v" */
+  object: string;
+  /** Model used */
+  model: string;
+  /** URL to download the generated video */
+  video_url: string;
+  /** Duration in seconds */
+  duration_seconds: number;
+  /** Cost of generation in USD */
+  cost: number;
+  /** Processing latency */
+  latency_ms: number;
+}
+
 // ============================================================================
 // Video API
 // ============================================================================
@@ -327,6 +360,40 @@ export class VideoAPI {
     }
 
     return this.downloadVideo(status.file_id);
+  }
+
+  /**
+   * Create video from an image (MiniMax Image-to-Video)
+   * 
+   * This is a long-running operation. The response is returned when the video is ready.
+   * 
+   * @example
+   * ```typescript
+   * // Basic I2V with image URL
+   * const video = await mql.video.createFromImage({
+   *   first_frame_image: 'https://example.com/first-frame.jpg',
+   *   prompt: 'The person waves hello and smiles',
+   *   duration: 6,
+   *   resolution: '1080P',
+   * });
+   * console.log('Video URL:', video.video_url);
+   * console.log('Duration:', video.duration_seconds, 'seconds');
+   * 
+   * // I2V with base64 image
+   * const base64Video = await mql.video.createFromImage({
+   *   model: 'MiniMax-Hailuo-2.3-Fast',
+   *   first_frame_image: 'data:image/jpeg;base64,/9j/4AAQSkZJRg...',
+   *   prompt: 'Camera slowly zooms in',
+   *   duration: 10,
+   *   prompt_optimizer: true,
+   * });
+   * ```
+   */
+  async createFromImage(request: MinimaxI2VRequest): Promise<MinimaxI2VResponse> {
+    return this.client.post<MinimaxI2VResponse>('/v1/videos/minimax/generations', {
+      model: 'MiniMax-Hailuo-2.3',
+      ...request,
+    });
   }
 
   private sleep(ms: number): Promise<void> {

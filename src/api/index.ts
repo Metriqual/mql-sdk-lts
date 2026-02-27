@@ -13,3 +13,5 @@ export { PromptHubAPI } from './prompt-hub';
 export { AudioAPI } from './audio';
 export { ImagesAPI } from './images';
 export { VideoAPI } from './video';
+export { EmbeddingsAPI } from './embeddings';
+export { MusicAPI } from './music';

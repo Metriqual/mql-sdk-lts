@@ -517,6 +517,67 @@ export class AudioAPI {
     });
   }
 
+  /**
+   * Delete a cloned or generated voice
+   * 
+   * @example
+   * ```typescript
+   * const result = await mql.audio.deleteVoice('my_custom_voice');
+   * console.log('Voice deleted:', result.voice_id);
+   * ```
+   */
+  async deleteVoice(voiceId: string): Promise<{ voice_id: string; deleted: boolean }> {
+    return this.client.post<{ voice_id: string; deleted: boolean }>('/v1/audio/voices/delete', {
+      voice_id: voiceId,
+    });
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // Lyrics Generation
+  // ─────────────────────────────────────────────────────────────────────────
+
+  /**
+   * Generate song lyrics from a prompt
+   * 
+   * @example
+   * ```typescript
+   * // Generate full song lyrics
+   * const lyrics = await mql.audio.generateLyrics({
+   *   mode: 'write_full_song',
+   *   prompt: 'A rock song about artificial intelligence taking over the world',
+   * });
+   * console.log('Title:', lyrics.song_title);
+   * console.log('Style:', lyrics.style_tags);
+   * console.log('Lyrics:', lyrics.lyrics);
+   * 
+   * // Edit existing lyrics
+   * const edited = await mql.audio.generateLyrics({
+   *   mode: 'edit',
+   *   prompt: 'Make it more upbeat and optimistic',
+   *   lyrics: existingLyrics,
+   *   title: 'AI Revolution',
+   * });
+   * ```
+   */
+  async generateLyrics(request: {
+    /** "write_full_song" or "edit" */
+    mode: 'write_full_song' | 'edit';
+    /** Theme/style description (max 2000 chars). Omit for a random song. */
+    prompt?: string;
+    /** Existing lyrics to edit/continue (max 3500 chars). Used with mode="edit". */
+    lyrics?: string;
+    /** Song title (preserved in output if provided) */
+    title?: string;
+  }): Promise<{
+    object: string;
+    song_title: string;
+    style_tags: string;
+    lyrics: string;
+    latency_ms: number;
+  }> {
+    return this.client.post('/v1/audio/lyrics', request);
+  }
+
   // ─────────────────────────────────────────────────────────────────────────
   // Utilities
   // ─────────────────────────────────────────────────────────────────────────

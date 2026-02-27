@@ -14,6 +14,8 @@ import { SubscriptionAPI } from './api/subscription';
 import { AudioAPI } from './api/audio';
 import { ImagesAPI } from './api/images';
 import { VideoAPI } from './api/video';
+import { EmbeddingsAPI } from './api/embeddings';
+import { MusicAPI } from './api/music';
 import type { MQLClientOptions } from './types';
 
 /**
@@ -100,6 +102,12 @@ export class MQL {
   /** Video API (video generation with Sora, Hailuo) */
   public readonly video: VideoAPI;
 
+  /** Embeddings API (create embeddings for RAG, semantic search) */
+  public readonly embeddings: EmbeddingsAPI;
+
+  /** Music API (generate music from lyrics and prompts) */
+  public readonly music: MusicAPI;
+
   /**
    * Create a new MQL SDK client
    * 
@@ -129,6 +137,8 @@ export class MQL {
     this.audio = new AudioAPI(this.httpClient);
     this.images = new ImagesAPI(this.httpClient);
     this.video = new VideoAPI(this.httpClient);
+    this.embeddings = new EmbeddingsAPI(this.httpClient);
+    this.music = new MusicAPI(this.httpClient);
   }
 
   /**
