@@ -10,3 +10,6 @@ export { PricingAPI } from './pricing';
 export { ExperimentsAPI } from './experiments';
 export { FeedbackAPI } from './feedback';
 export { PromptHubAPI } from './prompt-hub';
+export { AudioAPI } from './audio';
+export { ImagesAPI } from './images';
+export { VideoAPI } from './video';

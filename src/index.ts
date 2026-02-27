@@ -11,6 +11,9 @@ import { ExperimentsAPI } from './api/experiments';
 import { FeedbackAPI } from './api/feedback';
 import { PromptHubAPI } from './api/prompt-hub';
 import { SubscriptionAPI } from './api/subscription';
+import { AudioAPI } from './api/audio';
+import { ImagesAPI } from './api/images';
+import { VideoAPI } from './api/video';
 import type { MQLClientOptions } from './types';
 
 /**
@@ -88,6 +91,15 @@ export class MQL {
   /** Subscription & Plan API (B2B Model: Free + Enterprise) */
   public readonly subscription: SubscriptionAPI;
 
+  /** Audio API (TTS, STT, voice cloning, voice design) */
+  public readonly audio: AudioAPI;
+
+  /** Images API (image generation with DALL-E, GPT-Image) */
+  public readonly images: ImagesAPI;
+
+  /** Video API (video generation with Sora, Hailuo) */
+  public readonly video: VideoAPI;
+
   /**
    * Create a new MQL SDK client
    * 
@@ -114,6 +126,9 @@ export class MQL {
     this.feedback = new FeedbackAPI(this.httpClient);
     this.promptHub = new PromptHubAPI(this.httpClient);
     this.subscription = new SubscriptionAPI(this.httpClient);
+    this.audio = new AudioAPI(this.httpClient);
+    this.images = new ImagesAPI(this.httpClient);
+    this.video = new VideoAPI(this.httpClient);
   }
 
   /**
@@ -169,6 +184,9 @@ export {
   FeedbackAPI,
   PromptHubAPI,
   SubscriptionAPI,
+  AudioAPI,
+  ImagesAPI,
+  VideoAPI,
 };
 
 // Default export

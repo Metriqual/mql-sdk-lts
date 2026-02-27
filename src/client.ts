@@ -238,6 +238,99 @@ export class HttpClient {
   }
 
   /**
+   * POST request returning binary data (for audio/speech)
+   */
+  async postBinary(
+    path: string,
+    body?: unknown,
+    headers?: Record<string, string>
+  ): Promise<ArrayBuffer> {
+    const url = this.buildUrl(path);
+    const requestHeaders = this.buildHeaders({
+      ...headers,
+      'Accept': '*/*',
+    });
+
+    const response = await this.fetchFn(url, {
+      method: 'POST',
+      headers: requestHeaders,
+      body: body ? JSON.stringify(body) : undefined,
+    });
+
+    if (!response.ok) {
+      const errorBody = await response.json().catch(() => ({ error: response.statusText }));
+      throw MQLAPIError.fromResponse(errorBody as MQLError, response.status);
+    }
+
+    return response.arrayBuffer();
+  }
+
+  /**
+   * GET request returning binary data (for downloading audio/video)
+   */
+  async getBinary(
+    path: string,
+    headers?: Record<string, string>
+  ): Promise<ArrayBuffer> {
+    const url = this.buildUrl(path);
+    const requestHeaders = this.buildHeaders({
+      ...headers,
+      'Accept': '*/*',
+    });
+
+    const response = await this.fetchFn(url, {
+      method: 'GET',
+      headers: requestHeaders,
+    });
+
+    if (!response.ok) {
+      const errorBody = await response.json().catch(() => ({ error: response.statusText }));
+      throw MQLAPIError.fromResponse(errorBody as MQLError, response.status);
+    }
+
+    return response.arrayBuffer();
+  }
+
+  /**
+   * POST request with FormData (for file uploads)
+   */
+  async postFormData<T>(
+    path: string,
+    formData: FormData,
+    headers?: Record<string, string>
+  ): Promise<T> {
+    const url = this.buildUrl(path);
+    
+    // Build headers without Content-Type (browser will set multipart/form-data with boundary)
+    const requestHeaders: Record<string, string> = {
+      'Accept': 'application/json',
+    };
+
+    if (this.apiKey) {
+      requestHeaders['Authorization'] = `Bearer ${this.apiKey}`;
+    }
+    if (this.token) {
+      requestHeaders['Authorization'] = `Bearer ${this.token}`;
+    }
+    if (headers) {
+      Object.assign(requestHeaders, headers);
+    }
+
+    const response = await this.fetchFn(url, {
+      method: 'POST',
+      headers: requestHeaders,
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const errorBody = await response.json().catch(() => ({ error: response.statusText }));
+      throw MQLAPIError.fromResponse(errorBody as MQLError, response.status);
+    }
+
+    return response.json();
+  }
+
+  /**
    * Stream a POST request (for chat completions with streaming)
    */
   async *stream(
