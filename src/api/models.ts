@@ -9,7 +9,10 @@ export class ModelsAPI {
   constructor(private readonly client: HttpClient) {}
 
   /**
-   * List all available models (OpenAI format)
+   * List all available models from a specific provider (OpenAI format)
+   * 
+   * Note: The backend requires a provider prefix. Use listByProvider() directly.
+   * This method defaults to 'openai'.
    * 
    * @example
    * ```typescript
@@ -17,9 +20,8 @@ export class ModelsAPI {
    * data.forEach(model => console.log(model.id, model.ownedBy));
    * ```
    */
-  async list(): Promise<ModelListResponse> {
-    const response = await this.client.get<Record<string, unknown>>('/v1/models');
-    return this.transformResponse(response);
+  async list(provider: string = 'openai'): Promise<ModelListResponse> {
+    return this.listByProvider(provider);
   }
 
   /**
@@ -37,16 +39,23 @@ export class ModelsAPI {
   }
 
   /**
-   * Get a specific model by ID
+   * Get a specific model by ID from a provider
+   * 
+   * Note: Currently fetches the full model list from the provider 
+   * and filters by ID since no single-model endpoint exists.
    * 
    * @example
    * ```typescript
-   * const model = await mql.models.get('gpt-4o-mini');
+   * const model = await mql.models.get('gpt-4o-mini', 'openai');
    * ```
    */
-  async get(modelId: string): Promise<Model> {
-    const response = await this.client.get<Record<string, unknown>>(`/v1/models/${modelId}`);
-    return this.transformModel(response);
+  async get(modelId: string, provider: string = 'openai'): Promise<Model> {
+    const response = await this.listByProvider(provider);
+    const model = response.data.find(m => m.id === modelId);
+    if (!model) {
+      throw new Error(`Model '${modelId}' not found for provider '${provider}'`);
+    }
+    return model;
   }
 
   // ============================================================================

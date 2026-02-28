@@ -110,6 +110,9 @@ export class SubscriptionAPI {
 
   /**
    * Get trial status
+   * 
+   * @experimental Trial-specific endpoints are not yet available.
+   * Falls back to checking subscription status.
    *
    * @example
    * ```typescript
@@ -132,6 +135,9 @@ export class SubscriptionAPI {
   /**
    * Start a 14-day Enterprise trial
    * Requires company information for lead qualification
+   * 
+   * @experimental Company info endpoints are not yet available.
+   * Will return 404 until backend routes are registered.
    *
    * @example
    * ```typescript

@@ -89,7 +89,10 @@ export interface ExperimentAnalytics {
 /**
  * Experiments API
  *
- * Manage A/B testing experiments to compare different LLM configurations
+ * Manage A/B testing experiments to compare different LLM configurations.
+ * 
+ * @experimental These endpoints are not yet available on the backend.
+ * Calling these methods will return 404 until the backend routes are registered.
  */
 export class ExperimentsAPI {
   constructor(private readonly httpClient: HttpClient) {}

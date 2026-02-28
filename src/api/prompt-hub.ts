@@ -183,6 +183,8 @@ export class PromptHubAPI {
 
   /**
    * Share a prompt with a user or organization
+   * 
+   * @experimental Not yet available on backend. Will return 404.
    *
    * @example Share with a user
    * ```typescript
@@ -206,6 +208,8 @@ export class PromptHubAPI {
 
   /**
    * List shares for a prompt
+   * 
+   * @experimental Not yet available on backend. Will return 404.
    *
    * @example
    * ```typescript
@@ -218,6 +222,8 @@ export class PromptHubAPI {
 
   /**
    * Revoke a share
+   * 
+   * @experimental Not yet available on backend. Will return 404.
    *
    * @example
    * ```typescript
@@ -230,6 +236,8 @@ export class PromptHubAPI {
 
   /**
    * Get a shared prompt
+   * 
+   * @experimental Not yet available on backend. Will return 404.
    *
    * @example
    * ```typescript
@@ -242,6 +250,8 @@ export class PromptHubAPI {
 
   /**
    * Discover public prompts
+   * 
+   * @experimental Not yet available on backend. Will return 404.
    *
    * @example Search by category
    * ```typescript
@@ -274,6 +284,8 @@ export class PromptHubAPI {
 
   /**
    * Get a public prompt by ID
+   * 
+   * @experimental Not yet available on backend. Will return 404.
    *
    * @example
    * ```typescript
@@ -286,6 +298,8 @@ export class PromptHubAPI {
 
   /**
    * Star a prompt
+   * 
+   * @experimental Not yet available on backend. Will return 404.
    *
    * @example
    * ```typescript
@@ -298,6 +312,8 @@ export class PromptHubAPI {
 
   /**
    * Unstar a prompt
+   * 
+   * @experimental Not yet available on backend. Will return 404.
    *
    * @example
    * ```typescript
@@ -310,6 +326,8 @@ export class PromptHubAPI {
 
   /**
    * List starred prompts
+   * 
+   * @experimental Not yet available on backend. Will return 404.
    *
    * @example
    * ```typescript
@@ -322,6 +340,8 @@ export class PromptHubAPI {
 
   /**
    * Fork a prompt to create your own copy
+   * 
+   * @experimental Not yet available on backend. Will return 404.
    *
    * @example
    * ```typescript
@@ -340,9 +360,9 @@ export class PromptHubAPI {
    * await mql.promptHub.attachToKey('prompt_123', 'key_456');
    * ```
    */
-  async attachToKey(promptId: string, proxyKeyId: string): Promise<{ message: string }> {
-    return this.httpClient.post(`/v1/prompt-hub/prompts/${promptId}/attach`, {
-      proxy_key_id: proxyKeyId
+  async attachToKey(promptId: string, proxyKey: string): Promise<{ message: string }> {
+    return this.httpClient.post(`/v1/proxy-keys/${proxyKey}/prompt-hub`, {
+      prompt_id: promptId
     });
   }
 
@@ -354,8 +374,8 @@ export class PromptHubAPI {
    * await mql.promptHub.detachFromKey('prompt_123', 'key_456');
    * ```
    */
-  async detachFromKey(promptId: string, proxyKeyId: string): Promise<{ message: string }> {
-    return this.httpClient.delete(`/v1/prompt-hub/prompts/${promptId}/keys/${proxyKeyId}`);
+  async detachFromKey(promptId: string, proxyKey: string): Promise<{ message: string }> {
+    return this.httpClient.delete(`/v1/proxy-keys/${proxyKey}/prompt-hub/${promptId}`);
   }
 
   /**
@@ -366,8 +386,8 @@ export class PromptHubAPI {
    * const prompts = await mql.promptHub.listKeyPrompts('key_123');
    * ```
    */
-  async listKeyPrompts(proxyKeyId: string): Promise<PromptHubPrompt[]> {
-    return this.httpClient.get<PromptHubPrompt[]>(`/v1/prompt-hub/keys/${proxyKeyId}/prompts`);
+  async listKeyPrompts(proxyKey: string): Promise<PromptHubPrompt[]> {
+    return this.httpClient.get<PromptHubPrompt[]>(`/v1/proxy-keys/${proxyKey}/prompt-hub`);
   }
 
   /**
@@ -379,6 +399,6 @@ export class PromptHubAPI {
    * ```
    */
   async getPromptsForKey(proxyKey: string): Promise<PromptHubPrompt[]> {
-    return this.httpClient.get<PromptHubPrompt[]>(`/v1/prompt-hub/proxy-key/${proxyKey}/prompts`);
+    return this.httpClient.get<PromptHubPrompt[]>(`/v1/proxy-keys/${proxyKey}/prompt-hub`);
   }
 }

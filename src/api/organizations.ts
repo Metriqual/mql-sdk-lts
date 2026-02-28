@@ -186,7 +186,7 @@ export class OrganizationsAPI {
    * ```
    */
   async getMyInvites(): Promise<PendingInvite[]> {
-    const response = await this.client.get<Array<Record<string, unknown>>>('/v1/user/invites');
+    const response = await this.client.get<Array<Record<string, unknown>>>('/v1/invites/pending');
     return response.map(i => this.transformPendingInvite(i));
   }
 

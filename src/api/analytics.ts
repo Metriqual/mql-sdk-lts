@@ -80,7 +80,7 @@ export class AnalyticsAPI {
    * ```
    */
   async getUsageLogs(proxyKeyId: string): Promise<UsageLogsResponse> {
-    const response = await this.client.get<Record<string, unknown>>(`/v1/proxy-keys/${proxyKeyId}/usage/logs`);
+    const response = await this.client.get<Record<string, unknown>>(`/v1/user/proxy-keys/${proxyKeyId}/logs`);
     return this.transformUsageLogs(response);
   }
 
@@ -97,7 +97,7 @@ export class AnalyticsAPI {
    * ```
    */
   async getUsageAnalytics(proxyKeyId: string): Promise<UsageAnalyticsResponse> {
-    const response = await this.client.get<Record<string, unknown>>(`/v1/proxy-keys/${proxyKeyId}/usage`);
+    const response = await this.client.get<Record<string, unknown>>(`/v1/user/proxy-keys/${proxyKeyId}/usage`);
     return this.transformUsageAnalytics(response);
   }
 
@@ -107,6 +107,7 @@ export class AnalyticsAPI {
 
   /**
    * Get overview analytics for an organization
+   * @experimental Org-scoped analytics not yet available. Will return 404.
    */
   async getOrgOverview(orgId: string, query?: AnalyticsQuery): Promise<AnalyticsOverview> {
     const params = this.transformQuery(query);
@@ -116,6 +117,7 @@ export class AnalyticsAPI {
 
   /**
    * Get timeseries data for an organization
+   * @experimental Org-scoped analytics not yet available. Will return 404.
    */
   async getOrgTimeseries(orgId: string, query?: AnalyticsQuery): Promise<TimeseriesPoint[]> {
     const params = this.transformQuery(query);
@@ -125,6 +127,7 @@ export class AnalyticsAPI {
 
   /**
    * Get provider statistics for an organization
+   * @experimental Org-scoped analytics not yet available. Will return 404.
    */
   async getOrgProviderStats(orgId: string): Promise<ProviderStats[]> {
     const response = await this.client.get<Array<Record<string, unknown>>>(`/v1/organizations/${orgId}/analytics/providers`);

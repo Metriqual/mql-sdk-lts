@@ -107,7 +107,7 @@ export class FiltersAPI {
    * ```
    */
   async getTemplates(): Promise<FilterTemplatesResponse> {
-    const response = await this.client.get<Record<string, unknown>>('/v1/filter-templates');
+    const response = await this.client.get<Record<string, unknown>>('/v1/filters/templates');
     return this.transformTemplatesResponse(response);
   }
 
@@ -130,7 +130,7 @@ export class FiltersAPI {
       proxy_key_id: request.proxyKeyId,
       org_id: request.orgId,
     };
-    const response = await this.client.post<Record<string, unknown>>('/v1/user/filters/from-template', body);
+    const response = await this.client.post<Record<string, unknown>>('/v1/filters/from-template', body);
     return this.transformFilter(response);
   }
 
@@ -174,6 +174,7 @@ export class FiltersAPI {
 
   /**
    * Create a filter for an organization
+   * @experimental Org filter creation is not yet available. Backend only supports listing.
    */
   async createForOrg(orgId: string, request: CreateFilterRequest): Promise<Filter> {
     const body = this.transformCreateRequest({ ...request, orgId });

@@ -8,7 +8,10 @@ import type {
 
 /**
  * Webhooks API
- * Manage webhooks for real-time event notifications
+ * Manage webhooks for real-time event notifications.
+ * 
+ * @experimental These endpoints are not yet available on the backend.
+ * Calling these methods will return 404 until the backend routes are registered.
  */
 export class WebhooksAPI {
   constructor(private readonly client: HttpClient) {}
