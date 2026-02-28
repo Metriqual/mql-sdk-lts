@@ -7,16 +7,21 @@ import { HttpClient } from '../client';
 // --- TTS (Text-to-Speech) ---
 
 export interface SpeechRequest {
-  /** Model: "tts-1", "tts-1-hd" (OpenAI) or "speech-2.8-hd", "speech-2.8-turbo", etc. (MiniMax) */
+  /** Model: "tts-1", "tts-1-hd", "gpt-4o-mini-tts" (OpenAI) or "speech-02-hd" (MiniMax) */
   model: string;
-  /** The text to generate audio for */
+  /** The text to generate audio for (max 4096 chars) */
   input: string;
-  /** Voice: alloy, echo, fable, onyx, nova, shimmer (OpenAI) or voice_id (MiniMax) */
-  voice: string;
+  /** Voice: alloy, ash, ballad, coral, echo, fable, onyx, nova, sage, shimmer, verse, marin, cedar
+   *  or a custom voice object { id: "voice_1234" } (OpenAI), or voice_id string (MiniMax) */
+  voice: string | { id: string };
   /** Output format: mp3 (default), opus, aac, flac, wav, pcm */
   response_format?: 'mp3' | 'opus' | 'aac' | 'flac' | 'wav' | 'pcm';
   /** Speed 0.25–4.0 (default 1.0) */
   speed?: number;
+  /** Control voice with instructions (gpt-4o-mini-tts only) */
+  instructions?: string;
+  /** Stream format: "sse" or "audio" (gpt-4o-mini-tts only) */
+  stream_format?: 'sse' | 'audio';
 }
 
 export interface AsyncSpeechRequest {
@@ -73,10 +78,69 @@ export interface AsyncSpeechStatusResponse {
 export interface TranscriptionRequest {
   /** Audio file to transcribe */
   file: Blob | File;
-  /** Model: whisper-1 */
+  /** Model: whisper-1, gpt-4o-transcribe, gpt-4o-mini-transcribe */
   model: string;
   /** Language of the audio (ISO-639-1) */
   language?: string;
+  /** Prompt to guide the model */
+  prompt?: string;
+  /** Response format: json, text, srt, verbose_json, vtt, diarized_json */
+  response_format?: 'json' | 'text' | 'srt' | 'verbose_json' | 'vtt' | 'diarized_json';
+  /** Temperature for sampling */
+  temperature?: number;
+  /** Extra fields to include in response */
+  include?: ('logprobs')[];
+}
+
+export interface TranscriptionResponse {
+  text: string;
+  task?: string;
+  language?: string;
+  duration?: number;
+  logprobs?: Array<{
+    token?: string;
+    bytes?: number[];
+    logprob?: number;
+  }>;
+  usage?: {
+    input_tokens?: number;
+    output_tokens?: number;
+    total_tokens?: number;
+    type?: 'tokens' | 'duration';
+    seconds?: number;
+    input_token_details?: {
+      audio_tokens?: number;
+      text_tokens?: number;
+    };
+  };
+  segments?: Array<{
+    id: number | string;
+    start: number;
+    end: number;
+    text: string;
+    speaker?: string;
+    type?: string;
+    seek?: number;
+    temperature?: number;
+    avg_logprob?: number;
+    compression_ratio?: number;
+    no_speech_prob?: number;
+    tokens?: number[];
+  }>;
+  words?: Array<{
+    word: string;
+    start: number;
+    end: number;
+  }>;
+}
+
+// --- Translation ---
+
+export interface TranslationRequest {
+  /** Audio file to translate */
+  file: Blob | File;
+  /** Model: whisper-1 */
+  model: string;
   /** Prompt to guide the model */
   prompt?: string;
   /** Response format: json, text, srt, verbose_json, vtt */
@@ -85,9 +149,8 @@ export interface TranscriptionRequest {
   temperature?: number;
 }
 
-export interface TranscriptionResponse {
+export interface TranslationResponse {
   text: string;
-  task?: string;
   language?: string;
   duration?: number;
   segments?: Array<{
@@ -95,7 +158,71 @@ export interface TranscriptionResponse {
     start: number;
     end: number;
     text: string;
+    seek?: number;
+    temperature?: number;
+    avg_logprob?: number;
+    compression_ratio?: number;
+    no_speech_prob?: number;
+    tokens?: number[];
   }>;
+}
+
+// --- OpenAI Voice Creation ---
+
+export interface CreateVoiceRequest {
+  /** Audio sample for voice cloning */
+  audio_sample: Blob | File;
+  /** Consent confirmation */
+  consent: string;
+  /** Name for the voice */
+  name: string;
+  /** Optional description */
+  description?: string;
+}
+
+export interface CreateVoiceResponse {
+  id: string;
+  created_at: number;
+  name: string;
+  object: 'audio.voice';
+}
+
+// --- Voice Consents ---
+
+export interface VoiceConsent {
+  id: string;
+  created_at: number;
+  language: string;
+  name: string;
+  object: 'audio.voice_consent';
+}
+
+export interface CreateVoiceConsentRequest {
+  /** Audio recording of the consent phrase */
+  recording: Blob | File;
+  /** BCP 47 language tag (e.g. "en-US") */
+  language: string;
+  /** Label for this consent recording */
+  name: string;
+}
+
+export interface UpdateVoiceConsentRequest {
+  /** Updated label for this consent recording */
+  name: string;
+}
+
+export interface VoiceConsentDeleteResponse {
+  id: string;
+  deleted: boolean;
+  object: 'audio.voice_consent';
+}
+
+export interface VoiceConsentListResponse {
+  data: VoiceConsent[];
+  has_more: boolean;
+  object: 'list';
+  first_id?: string;
+  last_id?: string;
 }
 
 // --- Voice Clone ---
@@ -372,8 +499,38 @@ export class AudioAPI {
     if (request.prompt) formData.append('prompt', request.prompt);
     if (request.response_format) formData.append('response_format', request.response_format);
     if (request.temperature !== undefined) formData.append('temperature', String(request.temperature));
+    if (request.include) formData.append('include[]', request.include.join(','));
 
     return this.client.postFormData<TranscriptionResponse>('/v1/audio/transcriptions', formData);
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // Translation (Audio → English)
+  // ─────────────────────────────────────────────────────────────────────────
+
+  /**
+   * Translate audio to English text
+   * Uses OpenAI whisper-1 model
+   *
+   * @example
+   * ```typescript
+   * const result = await mql.audio.translate({
+   *   file: audioFile,
+   *   model: 'whisper-1',
+   * });
+   * console.log(result.text);
+   * ```
+   */
+  async translate(request: TranslationRequest): Promise<TranslationResponse> {
+    const formData = new FormData();
+    formData.append('file', request.file);
+    formData.append('model', request.model);
+
+    if (request.prompt) formData.append('prompt', request.prompt);
+    if (request.response_format) formData.append('response_format', request.response_format);
+    if (request.temperature !== undefined) formData.append('temperature', String(request.temperature));
+
+    return this.client.postFormData<TranslationResponse>('/v1/audio/translations', formData);
   }
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -530,6 +687,114 @@ export class AudioAPI {
     return this.client.post<{ voice_id: string; deleted: boolean }>('/v1/audio/voices/delete', {
       voice_id: voiceId,
     });
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // OpenAI Voice Creation
+  // ─────────────────────────────────────────────────────────────────────────
+
+  /**
+   * Create a custom OpenAI voice from an audio sample
+   * Requires consent and a name for the voice
+   *
+   * @example
+   * ```typescript
+   * const voice = await mql.audio.createVoice({
+   *   audio_sample: audioFile,
+   *   consent: 'I consent to voice creation',
+   *   name: 'My Custom Voice',
+   * });
+   * console.log('Voice ID:', voice.id);
+   * // Use in TTS: voice: { id: voice.id }
+   * ```
+   */
+  async createVoice(request: CreateVoiceRequest): Promise<CreateVoiceResponse> {
+    const formData = new FormData();
+    formData.append('audio_sample', request.audio_sample);
+    formData.append('consent', request.consent);
+    formData.append('name', request.name);
+    if (request.description) formData.append('description', request.description);
+
+    return this.client.postFormData<CreateVoiceResponse>('/v1/audio/voices/create', formData);
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // Voice Consents (OpenAI)
+  // ─────────────────────────────────────────────────────────────────────────
+
+  /**
+   * Upload a voice consent recording
+   *
+   * @example
+   * ```typescript
+   * const consent = await mql.audio.createVoiceConsent({
+   *   recording: audioFile,
+   *   language: 'en-US',
+   *   name: 'My Consent Recording',
+   * });
+   * console.log('Consent ID:', consent.id);
+   * ```
+   */
+  async createVoiceConsent(request: CreateVoiceConsentRequest): Promise<VoiceConsent> {
+    const formData = new FormData();
+    formData.append('recording', request.recording);
+    formData.append('language', request.language);
+    formData.append('name', request.name);
+    return this.client.postFormData<VoiceConsent>('/v1/audio/voice_consents', formData);
+  }
+
+  /**
+   * Retrieve a voice consent recording by ID
+   *
+   * @example
+   * ```typescript
+   * const consent = await mql.audio.getVoiceConsent('vc_abc123');
+   * console.log('Language:', consent.language);
+   * ```
+   */
+  async getVoiceConsent(consentId: string): Promise<VoiceConsent> {
+    return this.client.get<VoiceConsent>(`/v1/audio/voice_consents/${consentId}`);
+  }
+
+  /**
+   * Update a voice consent recording (metadata only)
+   *
+   * @example
+   * ```typescript
+   * const updated = await mql.audio.updateVoiceConsent('vc_abc123', { name: 'Updated Name' });
+   * ```
+   */
+  async updateVoiceConsent(consentId: string, request: UpdateVoiceConsentRequest): Promise<VoiceConsent> {
+    return this.client.post<VoiceConsent>(`/v1/audio/voice_consents/${consentId}`, request);
+  }
+
+  /**
+   * Delete a voice consent recording
+   *
+   * @example
+   * ```typescript
+   * const result = await mql.audio.deleteVoiceConsent('vc_abc123');
+   * console.log('Deleted:', result.deleted);
+   * ```
+   */
+  async deleteVoiceConsent(consentId: string): Promise<VoiceConsentDeleteResponse> {
+    return this.client.delete<VoiceConsentDeleteResponse>(`/v1/audio/voice_consents/${consentId}`);
+  }
+
+  /**
+   * List voice consent recordings
+   *
+   * @example
+   * ```typescript
+   * const consents = await mql.audio.listVoiceConsents();
+   * consents.data.forEach(c => console.log(c.id, c.name, c.language));
+   *
+   * // Pagination
+   * const page2 = await mql.audio.listVoiceConsents({ after: consents.last_id, limit: 10 });
+   * ```
+   */
+  async listVoiceConsents(params?: { after?: string; limit?: number }): Promise<VoiceConsentListResponse> {
+    return this.client.get<VoiceConsentListResponse>('/v1/audio/voice_consents', params as Record<string, string | number | boolean | undefined>);
   }
 
   // ─────────────────────────────────────────────────────────────────────────
