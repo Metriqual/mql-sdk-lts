@@ -5,10 +5,7 @@ import { FiltersAPI } from './api/filters';
 import { OrganizationsAPI } from './api/organizations';
 import { AnalyticsAPI } from './api/analytics';
 import { ModelsAPI } from './api/models';
-import { WebhooksAPI } from './api/webhooks';
 import { PricingAPI } from './api/pricing';
-import { ExperimentsAPI } from './api/experiments';
-import { FeedbackAPI } from './api/feedback';
 import { PromptHubAPI } from './api/prompt-hub';
 import { SubscriptionAPI } from './api/subscription';
 import { AudioAPI } from './api/audio';
@@ -75,17 +72,8 @@ export class MQL {
   /** Models listing API */
   public readonly models: ModelsAPI;
 
-  /** Webhooks API */
-  public readonly webhooks: WebhooksAPI;
-
   /** Pricing API */
   public readonly pricing: PricingAPI;
-
-  /** Experiments API (A/B Testing) */
-  public readonly experiments: ExperimentsAPI;
-
-  /** Feedback API */
-  public readonly feedback: FeedbackAPI;
 
   /** Prompt Hub API */
   public readonly promptHub: PromptHubAPI;
@@ -128,10 +116,7 @@ export class MQL {
     this.organizations = new OrganizationsAPI(this.httpClient);
     this.analytics = new AnalyticsAPI(this.httpClient);
     this.models = new ModelsAPI(this.httpClient);
-    this.webhooks = new WebhooksAPI(this.httpClient);
     this.pricing = new PricingAPI(this.httpClient);
-    this.experiments = new ExperimentsAPI(this.httpClient);
-    this.feedback = new FeedbackAPI(this.httpClient);
     this.promptHub = new PromptHubAPI(this.httpClient);
     this.subscription = new SubscriptionAPI(this.httpClient);
     this.audio = new AudioAPI(this.httpClient);
@@ -188,10 +173,7 @@ export {
   OrganizationsAPI,
   AnalyticsAPI,
   ModelsAPI,
-  WebhooksAPI,
   PricingAPI,
-  ExperimentsAPI,
-  FeedbackAPI,
   PromptHubAPI,
   SubscriptionAPI,
   AudioAPI,
