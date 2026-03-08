@@ -79,9 +79,6 @@ export interface ExportFeedbackParams {
  * Feedback API
  *
  * Collect and analyze user feedback on LLM responses.
- * 
- * @experimental These endpoints are not yet available on the backend.
- * Calling these methods will return 404 until the backend routes are registered.
  */
 export class FeedbackAPI {
   constructor(private readonly httpClient: HttpClient) {}
