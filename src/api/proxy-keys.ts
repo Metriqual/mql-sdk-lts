@@ -323,38 +323,37 @@ export class ProxyKeysAPI {
   }
 
   private transformTestResponse(response: Record<string, unknown>): ChatCompletionResponse {
-    // Test endpoint returns standard OpenAI format
+    // Test endpoint returns MQL format: { message, metadata } instead of OpenAI { choices, usage }
     const data = response as {
       id: string;
       object: 'chat.completion';
-      created: number;
       model: string;
-      choices: Array<{
-        index: number;
-        message: { role: string; content: string };
-        finish_reason: string | null;
-      }>;
-      usage: {
+      message: { role: string; content: string };
+      metadata: {
+        provider_id: string;
+        tokens_used: number;
         prompt_tokens: number;
         completion_tokens: number;
-        total_tokens: number;
+        finish_reason: string | null;
+        created: number;
       };
+      provider: string;
     };
 
     return {
       id: data.id,
       object: data.object,
-      created: data.created,
+      created: data.metadata.created,
       model: data.model,
-      choices: data.choices.map(c => ({
-        index: c.index,
-        message: c.message as ChatCompletionResponse['choices'][0]['message'],
-        finishReason: c.finish_reason as ChatCompletionResponse['choices'][0]['finishReason'],
-      })),
+      choices: [{
+        index: 0,
+        message: data.message as ChatCompletionResponse['choices'][0]['message'],
+        finishReason: data.metadata.finish_reason as ChatCompletionResponse['choices'][0]['finishReason'],
+      }],
       usage: {
-        promptTokens: data.usage.prompt_tokens,
-        completionTokens: data.usage.completion_tokens,
-        totalTokens: data.usage.total_tokens,
+        promptTokens: data.metadata.prompt_tokens,
+        completionTokens: data.metadata.completion_tokens,
+        totalTokens: data.metadata.tokens_used,
       },
     };
   }
