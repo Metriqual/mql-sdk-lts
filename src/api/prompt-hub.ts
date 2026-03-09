@@ -63,15 +63,7 @@ export interface PromptShare {
   created_at: string;
 }
 
-export interface DiscoverPromptsParams {
-  category?: PromptCategory;
-  search?: string;
-  tags?: string[];
-  model?: string;
-  sort_by?: 'recent' | 'popular' | 'stars';
-  limit?: number;
-  offset?: number;
-}
+
 
 export interface StarredPrompt {
   id: string;
@@ -248,53 +240,9 @@ export class PromptHubAPI {
     return this.httpClient.get<PromptHubPrompt>(`/v1/prompt-hub/shared/${shareToken}`);
   }
 
-  /**
-   * Discover public prompts
-   * 
-   * @experimental Not yet available on backend. Will return 404.
-   *
-   * @example Search by category
-   * ```typescript
-   * const prompts = await mql.promptHub.discover({
-   *   category: 'coding',
-   *   sort_by: 'popular'
-   * });
-   * ```
-   *
-   * @example Search by keywords
-   * ```typescript
-   * const prompts = await mql.promptHub.discover({
-   *   search: 'code review',
-   *   tags: ['programming', 'quality']
-   * });
-   * ```
-   */
-  async discover(params?: DiscoverPromptsParams): Promise<PromptHubPrompt[]> {
-    const queryParams: Record<string, string> = {};
-    if (params?.category) queryParams.category = params.category;
-    if (params?.search) queryParams.search = params.search;
-    if (params?.tags) queryParams.tags = params.tags.join(',');
-    if (params?.model) queryParams.model = params.model;
-    if (params?.sort_by) queryParams.sort_by = params.sort_by;
-    if (params?.limit) queryParams.limit = params.limit.toString();
-    if (params?.offset) queryParams.offset = params.offset.toString();
 
-    return this.httpClient.get<PromptHubPrompt[]>('/v1/prompt-hub/discover', queryParams);
-  }
 
-  /**
-   * Get a public prompt by ID
-   * 
-   * @experimental Not yet available on backend. Will return 404.
-   *
-   * @example
-   * ```typescript
-   * const prompt = await mql.promptHub.getPublic('prompt_123');
-   * ```
-   */
-  async getPublic(id: string): Promise<PromptHubPrompt> {
-    return this.httpClient.get<PromptHubPrompt>(`/v1/prompt-hub/public/${id}`);
-  }
+
 
   /**
    * Star a prompt
